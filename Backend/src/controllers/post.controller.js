@@ -1,7 +1,6 @@
 const postModel = require("../models/post.model.js");
 const imageKit = require("@imagekit/nodejs");
 const { toFile } = require("@imagekit/nodejs");
-const jwt = require("jsonwebtoken");
 
 const imagekit = new imageKit({
   privateKey: process.env.IMG_KEY,
@@ -9,23 +8,6 @@ const imagekit = new imageKit({
 
 async function createPostController(req, res) {
   console.log(req.body, req.file);
-
-  const token = req.cookies.token;
-  if (!token) {
-    return res.status(401).json({
-      message: "Token Not provided,Unauthorised Activity",
-    });
-  }
-
-  let decoded;
-
-  try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET);
-  } catch (error) {
-    return res.status(401).json({
-      message: "user not authorised",
-    });
-  }
 
   const file = await imagekit.files.upload({
     file: await toFile(Buffer.from(req.file.buffer), "file"),
@@ -36,7 +18,7 @@ async function createPostController(req, res) {
   const post = await postModel.create({
     caption: req.body.caption,
     imageUrl: file.url,
-    user: decoded.id,
+    user: req.user.id,
   });
 
   res.status(201).json({
@@ -46,23 +28,7 @@ async function createPostController(req, res) {
 }
 
 async function getPostController(req, res) {
-  const token = req.cookies.token;
-  if (!token) {
-    return res.status(401).json({
-      message: "Token not found, Unautharised activity",
-    });
-  }
-
-  let decoded;
-  try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET);
-  } catch (error) {
-    return res.status(401).json({
-      message: "Unautharised activity",
-    });
-  }
-
-  const userId = decoded.id;
+  const userId = req.user.id;
 
   const posts = await postModel.find({
     user: userId,
@@ -75,23 +41,7 @@ async function getPostController(req, res) {
 }
 
 async function getPostDetailsController(req, res) {
-  const token = req.cookies.token;
-  if (!token) {
-    return res.status(401).json({
-      message: "Token not Found",
-    });
-  }
-
-  let decoded;
-  try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET);
-  } catch (error) {
-    return res.status(401).json({
-      message: "Unautharised activity",
-    });
-  }
-
-  userId = decoded.id;
+  userId = req.user.id;
   postId = req.params.postId;
 
   const post = await postModel.findById(postId);
