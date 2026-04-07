@@ -13,5 +13,15 @@ followRouter.post(
   userIdentify,
   followController.UnfollowController,
 );
+followRouter.post(
+  "/accept/:username",
+  userIdentify,
+  followController.acceptFollowController,
+);
+followRouter.post(
+  "/reject/:username",
+  userIdentify,
+  followController.rejectFollowController,
+);
 
 module.exports = followRouter;

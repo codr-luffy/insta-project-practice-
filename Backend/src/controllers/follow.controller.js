@@ -33,11 +33,10 @@ async function followerController(req, res) {
   const followRecord = await followModel.create({
     followee: followeeUser,
     follower: followerUser,
+    status: "pending",
   });
-  console.log("followRecord:", followRecord); // ✅ yeh add karo
-  console.log(followerUser);
   res.status(201).json({
-    message: `You are now following ${followeeUser}`,
+    message: `following request sended to ${followeeUser} sucessfully`,
     follow: followRecord,
   });
 }
@@ -68,7 +67,76 @@ async function UnfollowController(req, res) {
   });
 }
 
+async function acceptFollowController(req, res) {
+  const followerUser = req.user.username;
+  const followeeUser = req.params.username;
+
+  const follower = await userModel.findOne({
+    username: followerUser,
+  });
+  if (!follower) {
+    return res.status(404).json({
+      message: "follower not exist",
+    });
+  }
+
+  const followRecord = await followModel.findOne({
+    follower: followerUser,
+    followee: followeeUser,
+    // status: "pending",
+  });
+  if (!followRecord) {
+    return res.status(404).json({
+      message: "No pending request found",
+      followRecord,
+    });
+  }
+
+  followRecord.status = "accepted";
+  await followRecord.save();
+
+  res.status(201).json({
+    message: "Follow Accepted sucessfully",
+    followRecord,
+  });
+}
+
+async function rejectFollowController(req, res) {
+  const followerUser = req.user.username;
+  const followeeUser = req.params.username;
+
+  const follower = await userModel.findOne({
+    username: followerUser,
+  });
+  if (!follower) {
+    return res.status(404).json({
+      message: "follower not exist",
+    });
+  }
+
+  const followRecord = await followModel.findOne({
+    follower: followerUser,
+    followee: followeeUser,
+    status: "pending",
+  });
+  if (!followRecord) {
+    return res.status(404).json({
+      message: "No pending request found",
+    });
+  }
+
+  followRecord.status = "rejected";
+  await followRecord.save();
+
+  res.status(201).json({
+    message: "Follow rejected sucessfully",
+    followRecord,
+  });
+}
+
 module.exports = {
   followerController,
   UnfollowController,
+  acceptFollowController,
+  rejectFollowController,
 };
