@@ -1,23 +1,18 @@
-const Post = () => {
+const Post = ({ user, posts }) => {
   return (
     <div className="post">
       <div className="user">
         <div className="img-wraper">
-          <img
-            src="https://images.unsplash.com/photo-1724710152067-f5cda1ed9820?q=80&w=464&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt=""
-          />
+          <img src={user.profilePic} alt="" />
         </div>
-        <p className="username">Username</p>
+        <p>{user.username}</p>
       </div>
-      <img
-        src="https://images.unsplash.com/photo-1775563622936-2bac8f284416?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDE4fHRvd0paRnNrcEdnfHxlbnwwfHx8fHw%3D"
-        alt=""
-      />
+      <img src={posts.imageUrl} alt="" />
       <div className="icons">
         <div className="left">
           <button>
             <svg
+              className={posts.isLiked ? "liked" : ""}
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="currentColor"
@@ -57,7 +52,7 @@ const Post = () => {
         </div>
       </div>
       <div className="bottom">
-        <p className="caption">caption</p>
+        <p className="caption">{posts.caption}</p>
       </div>
     </div>
   );
