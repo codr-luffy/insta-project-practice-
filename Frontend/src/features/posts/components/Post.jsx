@@ -1,4 +1,4 @@
-const Post = ({ user, posts }) => {
+const Post = ({ user, posts, handleLike, handleUnLike, loading }) => {
   return (
     <div className="post">
       <div className="user">
@@ -13,6 +13,9 @@ const Post = ({ user, posts }) => {
           <button>
             <svg
               className={posts.isLiked ? "liked" : ""}
+              onClick={() => {
+                posts.isLiked ? handleUnLike(posts._id) : handleLike(posts._id);
+              }}
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="currentColor"

@@ -10,3 +10,23 @@ export async function getFeed() {
   console.log(response);
   return response.data;
 }
+
+export async function createPost(imageFile, caption) {
+  const formData = new FormData();
+
+  formData.append("image", imageFile);
+  formData.append("caption", caption);
+
+  const responce = await api.post("/api/posts", formData);
+  return responce.data;
+}
+
+export async function likePost(postId) {
+  const responce = await api.post("/api/posts/like/" + postId);
+  return responce.data;
+}
+
+export async function unlikePost(postId) {
+  const responce = await api.post("/api/posts/unlike/" + postId);
+  return responce.data;
+}

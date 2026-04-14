@@ -88,18 +88,41 @@ async function likePostController(req, res) {
   });
 }
 
+async function unlikePostController(req, res) {
+  const postId = req.params.postId;
+  const username = req.user.username;
+
+  const islike = await likeModel.findOne({ post: postId, user: username });
+  if (!islike) {
+    return res.status(404).json({
+      message: "Post didn't liked",
+    });
+  }
+
+  const unLike = await likeModel.findOneAndDelete({
+    _id: islike._id,
+  });
+
+  res.status(201).json({
+    message: "Post Unliked sucessfully",
+    unLike,
+  });
+}
+
 async function getFeedController(req, res) {
   const post = await Promise.all(
-    (await postModel.find().populate("user").lean()).map(async (post) => {
-      const isLiked = await likeModel.findOne({
-        post: post._id,
-        user: req.user.username,
-      });
+    (await postModel.find({}).sort({ _id: -1 }).populate("user").lean()).map(
+      async (post) => {
+        const isLiked = await likeModel.findOne({
+          post: post._id,
+          user: req.user.username,
+        });
 
-      post.isLiked = !!isLiked;
+        post.isLiked = !!isLiked;
 
-      return post;
-    }),
+        return post;
+      },
+    ),
   );
   res.status(200).json({
     message: "Post Fetch sucessfully",
@@ -112,5 +135,6 @@ module.exports = {
   getPostController,
   getPostDetailsController,
   likePostController,
+  unlikePostController,
   getFeedController,
 };
